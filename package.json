@@ -1,15 +1,17 @@
 {
-  "name": "idea-town",
-  "description": "A place where ideas come to idea",
+  "name": "mozilla-idea-town-app",
+  "description": "dom twiddling for the town of ideas",
   "version": "1.0.0",
   "author": "Mozilla (https://mozilla.org/)",
   "bugs": {
-    "url": "https://github.com/mozilla/idea-town/issues"
+    "url": "https://github.com/mozilla/idea-town-app/issues"
   },
   "dependencies": {
+    "ampersand": "^3.0.5",
     "ampersand-app": "^1.0.4",
     "ampersand-collection": "^1.4.5",
     "ampersand-collection-view": "^1.4.0",
+    "ampersand-model": "^5.0.3",
     "ampersand-router": "^3.0.2",
     "ampersand-state": "^4.5.6",
     "ampersand-view": "^8.0.1",
@@ -19,6 +21,8 @@
     "bluebird": "^2.9.34",
     "domready": "^1.0.8",
     "file-loader": "^0.8.4",
+    "gulp-if": "^1.2.5",
+    "gulp-webpack": "^1.5.0",
     "hogan": "^1.0.2",
     "hogan.js": "^3.0.2",
     "html-webpack-plugin": "^1.6.1",
@@ -59,21 +63,18 @@
     "install": "^0.1.8",
     "run-sequence": "^1.1.2",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "webpack-dev-server": "^1.10.1"
+    "vinyl-source-stream": "^1.1.0"
   },
-  "directories": {
-    "doc": "docs"
-  },
-  "homepage": "https://github.com/mozilla/idea-town#readme",
+  "homepage": "https://github.com/mozilla/idea-town-app#readme",
   "license": "MPL-2.0",
   "private": "true",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mozilla/idea-town.git"
+    "url": "git+https://github.com/mozilla/idea-town-app.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server"
+    "build": "gulp",
+    "lint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

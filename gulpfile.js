@@ -6,6 +6,7 @@ const cache = require('gulp-cache');
 const del = require('del');
 const eslint = require('gulp-eslint');
 const gulp = require('gulp');
+const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const imagemin = require('gulp-imagemin');
 const minifycss = require('gulp-minify-css');
@@ -18,10 +19,10 @@ const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify');
 const connect = require('gulp-connect');
 
-const IS_DEBUG = true;
+const IS_DEBUG = process.env.NODE_ENV !== 'production';
 
-const SRC_PATH = './client-src/';
-const DEST_PATH = './client-build/';
+const SRC_PATH = './src/';
+const DEST_PATH = './dist/';
 
 // Lint the gulpfile
 gulp.task('selfie', function selfieTask() {
@@ -32,7 +33,7 @@ gulp.task('selfie', function selfieTask() {
 
 // Lint the *.js files
 gulp.task('lint', function lintTask() {
-  return gulp.src(['*.js', SRC_PATH + 'scripts/**/*.js'])
+  return gulp.src(['*.js', SRC_PATH + 'app/**/*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
@@ -45,7 +46,7 @@ gulp.task('clean', function cleanTask(done) {
 });
 
 gulp.task('npm:tabzilla:img', function npmTabzillaImgTask() {
-  return gulp.src('node_modules/mozilla-tabzilla/media/**')
+  return gulp.src('./node_modules/mozilla-tabzilla/media/**')
     .pipe(gulp.dest(DEST_PATH + 'vendor/mozilla-tabzilla/media'));
 });
 
@@ -53,14 +54,14 @@ gulp.task('npm:tabzilla:img', function npmTabzillaImgTask() {
 gulp.task('npm:tabzilla:css', function npmTabzillaCssTask() {
   return gulp.src('./node_modules/mozilla-tabzilla/css/tabzilla.css')
     .pipe(rename('mozilla-tabzilla/css/tabzilla.scss'))
-    .pipe(gulp.dest(SRC_PATH + 'vendor'));
+    .pipe(gulp.dest(SRC_PATH + 'styles/vendor'));
 });
 
 // Copy the normalize assets into the src dir for inclusion in minimization
 gulp.task('npm:normalize', function npmNormalizeTask() {
   return gulp.src('./node_modules/normalize.css/normalize.css')
     .pipe(rename('normalize.css/normalize.scss'))
-    .pipe(gulp.dest(SRC_PATH + 'vendor'));
+    .pipe(gulp.dest(SRC_PATH + 'styles/vendor'));
 });
 
 gulp.task('vendor', function vendorTask(done) {
@@ -73,7 +74,7 @@ gulp.task('vendor', function vendorTask(done) {
 
 // Scripts
 gulp.task('scripts', function scriptsTask() {
-  const b = browserify(SRC_PATH + 'scripts/main.js', {
+  const b = browserify(SRC_PATH + 'app/main.js', {
     debug: IS_DEBUG
   });
 
@@ -83,10 +84,10 @@ gulp.task('scripts', function scriptsTask() {
     .pipe(source('main.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(uglify())
+    .pipe(gulpif(!IS_DEBUG, uglify())) // don't uglify in development
     .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(DEST_PATH + 'scripts'));
+    .pipe(gulp.dest(DEST_PATH + 'app'));
 });
 
 // Styles
@@ -122,7 +123,7 @@ gulp.task('build', function buildTask(done) {
 gulp.task('watch', ['build'], function watchTask () {
   gulp.watch(SRC_PATH + 'styles/**/*', ['styles']);
   gulp.watch(SRC_PATH + 'images/**/*', ['images']);
-  gulp.watch(SRC_PATH + 'scripts/**/*', ['scripts']);
+  gulp.watch(SRC_PATH + 'app/**/*', ['scripts']);
 });
 
 // Set up a webserver for the static assets
