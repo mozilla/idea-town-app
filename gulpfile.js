@@ -5,6 +5,7 @@ const buffer = require('vinyl-buffer');
 const cache = require('gulp-cache');
 const del = require('del');
 const eslint = require('gulp-eslint');
+const globby = require('globby');
 const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
@@ -16,6 +17,7 @@ const runSequence = require('run-sequence');
 const sass = require('gulp-sass');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
+const through = require('through2');
 const uglify = require('gulp-uglify');
 const connect = require('gulp-connect');
 
@@ -31,7 +33,6 @@ gulp.task('selfie', function selfieTask() {
     .pipe(eslint.format());
 });
 
-// Lint the *.js files
 gulp.task('lint', function lintTask() {
   return gulp.src(['*.js', SRC_PATH + 'app/**/*.js'])
     .pipe(eslint())
@@ -72,25 +73,35 @@ gulp.task('vendor', function vendorTask(done) {
   ], done);
 });
 
-// Scripts
+// based on https://github.com/gulpjs/gulp/blob/master/docs/recipes/browserify-with-globs.md
 gulp.task('scripts', function scriptsTask() {
-  const b = browserify(SRC_PATH + 'app/main.js', {
-    debug: IS_DEBUG
-  });
+  const bundledStream = through();
 
-  return b
-    .transform(babelify)
-    .bundle()
-    .pipe(source('main.js'))
+  // this part runs second
+  bundledStream
+    .pipe(source('app.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
-    .pipe(gulpif(!IS_DEBUG, uglify())) // don't uglify in development
+     // don't uglify in development. eases build chain debugging
+    .pipe(gulpif(!IS_DEBUG, uglify()))
     .on('error', gutil.log)
     .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(DEST_PATH + 'app'));
+    .pipe(gulp.dest(DEST_PATH + 'app/'));
+
+  // this part runs first, then pipes to bundledStream
+  globby([SRC_PATH + '/app/**/*.js'], function(err, entries) {
+    if (err) { return bundledStream.emit('error', err); }
+    const b = browserify({
+      entries: entries,
+      debug: IS_DEBUG,
+      transform: [babelify]
+    });
+    b.bundle().pipe(bundledStream);
+  });
+
+  return bundledStream;
 });
 
-// Styles
 gulp.task('styles', function stylesTask() {
   return gulp.src(SRC_PATH + 'styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
@@ -101,7 +112,6 @@ gulp.task('styles', function stylesTask() {
     .pipe(gulp.dest(DEST_PATH + 'styles'));
 });
 
-// Images
 gulp.task('images', function imagesTask() {
   return gulp.src(SRC_PATH + 'images/**/*')
     .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
@@ -119,7 +129,6 @@ gulp.task('build', function buildTask(done) {
   );
 });
 
-// Watches the things
 gulp.task('watch', ['build'], function watchTask () {
   gulp.watch(SRC_PATH + 'styles/**/*', ['styles']);
   gulp.watch(SRC_PATH + 'images/**/*', ['images']);
