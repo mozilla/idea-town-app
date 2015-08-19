@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <title>Universal Search | Idea Town</title>
+    <!-- inject:css -->
+    <!-- endinject -->
+</head>
+<body>
+  <!-- container div -->
+  <div>
+    <!-- this header has a compact logo & more of a breadcrumb thing about it -->
+    <!-- figure out how to vary that without varying the underlying html, for reuse -->
+    {{> header }}
+
+    <h1>Universal Search</h1>
+    <div class="description">
+      <p>Short description of the Universal Search addon.
+      <!-- scroll down to complete desc -->
+      <a href="#details">Read More</a>
+    </div>
+    <!-- TODO this seems to be a reusable module -->
+    <div class="actions">
+      <div role="button" class="experiment-settings"><img src="gear-icon.png"></div>
+      <!-- stop button type for leaving active experiments -->
+      <button data-hook="stop">Stop Experiment</button>
+      <!-- TODO not in the comp, but we should ask for feedback here w/button 
+           if you are in the experiment -->
+      <button data-hook="feedback">Leave Feedback</button>
+    </div>
+    <div class="social-share">
+      <button data-hook="facebook-share">fb-icon</button>
+      <button data-hook="twitter-share">tw-icon</button>
+    </div>
+    <!-- not in the comp but needed: data usage widget & how FF is changed widget-->
+    <div class="ff-changes">
+      <h3>Changes in Firefox</h3>
+      <ul>
+        <li>Dropdown contains richer results
+        <li>Search box is gone
+        <li>Better autocomplet results
+    </div>
+    <div class="data-usage">
+      <h3>Data collected for this experiment</h3>
+      <ul>
+        <li>Something that is collected
+        <li>Something else that's collected
+      </ul>
+    </div>
+    <!-- TODO this also seems reusable. position at top-right? -->
+    <div class="mini-tour">
+      <div>
+        <img src="first-preview-image">
+        <p>Cool Feature
+      </div>
+      <div>
+        <img src="second-preview-image">
+        <p>Another Feature
+      </div>
+      <div>
+        <img src="third-preview-image">
+        <p>More Details
+      </div>
+      <div>
+        <img src="fourth-preview-image">
+        <p>Compelling Prose
+      </div>
+      <!-- could open a modal or scroll down the page -->
+      <a href="#product-tour">View More Images</a>
+    </div>
+    <ul id="product-tour">
+      <!-- huge full-width list items -->
+      <li>
+        <h3>All your stuff in one place</h3>
+        <img src="huge-image-1.png">
+      </li>
+      <li>
+        <h3>Intelligent Results</h3>
+        <img src="huge-image-2.png">
+      </li>
+    </ul>
+    {{> footer }}
+  </div>
+
+  <!-- absolutely-positioned, conditionally-displayed components at the bottom of the page -->
+  <!-- notification bar will pop down from the top of the screen -->
+  <div id="notification-bar" hidden></div>
+
+  <!-- modal might be an option for the product tour, idk -->
+  <div id="lightbox" hidden></div>
+
+  <!-- inject:js -->
+  <!-- endinject -->
+</body>
+</html>
