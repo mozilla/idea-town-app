@@ -92,7 +92,7 @@ gulp.task('scripts', function scriptsTask() {
 
 // Styles
 gulp.task('styles', function stylesTask() {
-  return gulp.src(SRC_PATH + 'styles/main.scss')
+  return gulp.src(SRC_PATH + 'styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer('last 2 version'))
     .pipe(gulp.dest(DEST_PATH + 'styles'))
