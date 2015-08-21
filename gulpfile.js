@@ -10,6 +10,7 @@ const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const imagemin = require('gulp-imagemin');
+const inject = require('gulp-inject');
 const minifycss = require('gulp-minify-css');
 const notify = require('gulp-notify');
 const rename = require('gulp-rename');
@@ -73,6 +74,14 @@ gulp.task('vendor', function vendorTask(done) {
   ], done);
 });
 
+gulp.task('index', function() {
+  return gulp.src(SRC_PATH + 'index.html')
+    .pipe(
+      inject(gulp.src([DEST_PATH + 'app/app.js', DEST_PATH + 'styles/**/*.min.css'], {read: false}), {ignorePath: 'dist'})
+    )
+    .pipe(gulp.dest(DEST_PATH + 'index.html'));
+});
+
 // based on https://github.com/gulpjs/gulp/blob/master/docs/recipes/browserify-with-globs.md
 gulp.task('scripts', function scriptsTask() {
   const bundledStream = through();
@@ -89,7 +98,7 @@ gulp.task('scripts', function scriptsTask() {
     .pipe(gulp.dest(DEST_PATH + 'app/'));
 
   // this part runs first, then pipes to bundledStream
-  globby([SRC_PATH + '/app/**/*.js'], function(err, entries) {
+  globby([SRC_PATH + 'app/**/*.js'], function(err, entries) {
     if (err) { return bundledStream.emit('error', err); }
     const b = browserify({
       entries: entries,
@@ -102,6 +111,7 @@ gulp.task('scripts', function scriptsTask() {
   return bundledStream;
 });
 
+// TODO: any good reason this step isn't including the vendor css?
 gulp.task('styles', function stylesTask() {
   return gulp.src(SRC_PATH + 'styles/**/*.scss')
     .pipe(sass().on('error', sass.logError))
@@ -125,6 +135,7 @@ gulp.task('build', function buildTask(done) {
     'scripts',
     'styles',
     'images',
+    'index',
     done
   );
 });
