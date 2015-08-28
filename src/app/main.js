@@ -34,7 +34,7 @@ app.extend({
     app.me = new Me();
 
     // ping the addon to see if it's installed
-    this.listenTo(webChannel, 'from-addon-to-web', (data) => console.log(data));
+    this.listenTo(webChannel, 'from-addon-to-web', (data) => console.log(data)); // eslint-disable-line no-console
     webChannel.sendMessage('from-web-to-addon', { loaded: true });
 
     // start with the home page view
