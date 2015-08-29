@@ -1,8 +1,10 @@
 const autoprefixer = require('gulp-autoprefixer');
 const babelify = require('babelify');
+const bourbon = require('node-bourbon');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const cache = require('gulp-cache');
+const connect = require('gulp-connect');
 const del = require('del');
 const eslint = require('gulp-eslint');
 const globby = require('globby');
@@ -12,6 +14,7 @@ const gutil = require('gulp-util');
 const imagemin = require('gulp-imagemin');
 const inject = require('gulp-inject');
 const minifycss = require('gulp-minify-css');
+const neat = require('node-neat');
 const rename = require('gulp-rename');
 const runSequence = require('run-sequence');
 const sass = require('gulp-sass');
@@ -19,7 +22,6 @@ const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
 const uglify = require('gulp-uglify');
-const connect = require('gulp-connect');
 
 const IS_DEBUG = process.env.NODE_ENV !== 'production';
 
@@ -114,8 +116,7 @@ gulp.task('scripts', function scriptsTask() {
 gulp.task('styles', function stylesTask() {
   return gulp.src(SRC_PATH + 'styles/**/*.scss')
     .pipe(sass({
-      includePaths: require('node-bourbon')
-                    .with(require('node-neat').includePaths)
+      includePaths: bourbon.with(neat.includePaths)
     }).on('error', sass.logError))
     .pipe(autoprefixer('last 2 versions'))
     .pipe(gulp.dest(DEST_PATH + 'styles'))
